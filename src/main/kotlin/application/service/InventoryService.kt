@@ -1,4 +1,4 @@
 package application.service
 
-class InventoryService {
-}
+
+class InventoryService()

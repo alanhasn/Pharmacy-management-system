@@ -1,4 +1,6 @@
 package domain.model
 
-class PrescriptionItem {
-}
+data class PrescriptionItem(
+    val medicine: Medicine,
+    val quantity: Int
+)

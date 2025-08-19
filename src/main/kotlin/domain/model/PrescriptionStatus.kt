@@ -1,6 +1,6 @@
 package domain.model
 
-enum class OrderState {
+enum class PrescriptionStatus {
     Pending,
     Approved,
     Rejected
