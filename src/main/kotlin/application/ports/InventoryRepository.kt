@@ -1,12 +1,11 @@
 package application.ports
 
-import domain.model.Medicine
+import domain.model.InventoryItem
 
 interface InventoryRepository {
-
-    fun save(medicine: Medicine)
-    fun findById(id: String): Medicine?
-    fun findAll(): List<Medicine>
+    fun save(item: InventoryItem)
+    fun findByMedicineId(id: String): InventoryItem?
+    fun findAll(): List<InventoryItem>
     fun isAvailable(medicineId: String, requiredQuantity: Int): Boolean
     fun reduceStock(medicineId: String, quantity: Int): Boolean
     fun addStock(medicineId: String, quantity: Int): Boolean
