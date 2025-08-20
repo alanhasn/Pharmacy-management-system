@@ -3,20 +3,41 @@ package application.service
 import application.ports.InventoryRepository
 import application.ports.PrescriptionRepository
 import domain.model.Prescription
+import domain.model.PrescriptionItem
 import domain.model.PrescriptionStatus
 
 class PrescriptionService(
     private val prescriptionRepository: PrescriptionRepository,
-    private val inventoryRepository: InventoryRepository
+    private val inventoryRepository: InventoryRepository,
+    private val customerService: CustomerService,
+    private val pharmacistService: PharmacistService
 ) {
 
     /**
      * Create a new prescription:
+     * - Load customer & pharmacist
      * - Validate medicine availability
      * - Reduce stock
      * - Save prescription
      */
-    fun createPrescription(prescription: Prescription): PrescriptionStatus {
+    fun createPrescription(
+        customerId: String,
+        pharmacistId: String,
+        items: List<PrescriptionItem>
+    ): PrescriptionStatus {
+        // 0. load customer & pharmacist
+        val customer = customerService.getCustomerById(customerId)
+            ?: return PrescriptionStatus.Rejected("Customer not found")
+
+        val pharmacist = pharmacistService.getPharmacistById(pharmacistId)
+            ?: return PrescriptionStatus.Rejected("Pharmacist not found")
+
+        val prescription = Prescription(
+            customer = customer,
+            pharmacist = pharmacist,
+            items = items
+        )
+
         // 1. check availability
         for (item in prescription.items) {
             val available = inventoryRepository.isAvailable(item.medicine.id, item.quantity)
