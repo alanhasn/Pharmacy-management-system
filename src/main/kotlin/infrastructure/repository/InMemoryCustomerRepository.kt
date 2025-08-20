@@ -2,23 +2,25 @@ package infrastructure.repository
 
 import application.ports.CustomerRepository
 import domain.model.Customer
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class InMemoryCustomerRepository : CustomerRepository {
     private val customers = mutableListOf<Customer>()
 
-    override fun save(customer: Customer) {
+    override suspend fun save(customer: Customer) = withContext(Dispatchers.IO) {
         customers.add(customer)
     }
 
-    override fun findById(id: String): Customer? {
-        return customers.find { it.id == id }
+    override suspend fun findById(id: String): Customer? = withContext(Dispatchers.IO) {
+        return@withContext customers.find { it.id == id }
     }
 
-    override fun findAll(): List<Customer> {
-        return customers.toList()
+    override suspend fun findAll(): List<Customer> = withContext(Dispatchers.IO) {
+        return@withContext customers.toList()
     }
 
-    override fun deleteById(id: String): Boolean {
-        return customers.removeIf { it.id == id }
+    override suspend fun deleteById(id: String): Boolean = withContext(Dispatchers.IO) {
+        return@withContext customers.removeIf { it.id == id }
     }
 }

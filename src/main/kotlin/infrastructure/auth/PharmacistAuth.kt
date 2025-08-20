@@ -1,4 +1,5 @@
 package infrastructure.auth
 
-class PharmacistAuth {
+class PharmacistAuth (){
+
 }

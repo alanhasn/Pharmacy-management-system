@@ -2,6 +2,8 @@ package infrastructure.repository
 
 import application.ports.PrescriptionRepository
 import domain.model.Prescription
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  * Class that implements the PrescriptionRepository interface
@@ -15,7 +17,7 @@ class InMemoryPrescriptionRepository : PrescriptionRepository {
      * @param prescription
      * return void
      */
-    override fun save(prescription: Prescription) {
+    override suspend fun save(prescription: Prescription)= withContext(Dispatchers.IO) {
         prescriptions.add(prescription)
     }
 
@@ -24,7 +26,7 @@ class InMemoryPrescriptionRepository : PrescriptionRepository {
      * @param prescription
      * return void
      */
-    override fun delete(prescription: Prescription) {
+    override suspend fun delete(prescription: Prescription) = withContext(Dispatchers.IO) {
         prescriptions.removeIf { it.id == prescription.id }
     }
 
@@ -33,7 +35,7 @@ class InMemoryPrescriptionRepository : PrescriptionRepository {
      * @param id
      * return void
      */
-    override fun deleteById(id: String) {
+    override suspend fun deleteById(id: String) = withContext(Dispatchers.IO) {
         prescriptions.removeIf { it.id == id }
     }
 
@@ -42,8 +44,8 @@ class InMemoryPrescriptionRepository : PrescriptionRepository {
      * @param id
      * @return
      */
-    override fun findById(id: String): Prescription? {
-        return prescriptions.find { it.id == id }
+    override suspend fun findById(id: String): Prescription? = withContext(Dispatchers.IO) {
+        return@withContext prescriptions.find { it.id == id }
     }
 
     /**
@@ -51,8 +53,8 @@ class InMemoryPrescriptionRepository : PrescriptionRepository {
      * @param customerId
      * @return List<Prescription>
      */
-    override fun findByCustomer(customerId: String): List<Prescription> {
-        return prescriptions.filter { it.customer.id == customerId }
+    override suspend fun findByCustomer(customerId: String): List<Prescription> = withContext(Dispatchers.IO) {
+        return@withContext prescriptions.filter { it.customer.id == customerId }
     }
 
     /**
@@ -60,15 +62,15 @@ class InMemoryPrescriptionRepository : PrescriptionRepository {
      * @param pharmacistId
      * @return List<Prescription>
      */
-    override fun findByPharmacist(pharmacistId: String): List<Prescription> {
-        return prescriptions.filter { it.pharmacist.id == pharmacistId }
+    override suspend fun findByPharmacist(pharmacistId: String): List<Prescription> = withContext(Dispatchers.IO) {
+        return@withContext prescriptions.filter { it.pharmacist.id == pharmacistId }
     }
 
     /**
      * Find all prescriptions
      * @return List<Prescription>
      */
-    override fun findAll(): List<Prescription> {
-        return prescriptions.toList()
+    override suspend fun findAll(): List<Prescription> = withContext(Dispatchers.IO) {
+        return@withContext prescriptions.toList()
     }
 }

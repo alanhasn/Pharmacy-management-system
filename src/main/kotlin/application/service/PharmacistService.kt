@@ -2,6 +2,7 @@ package application.service
 
 import application.ports.PharmacistRepository
 import domain.model.Pharmacist
+import kotlinx.coroutines.delay
 
 class PharmacistService(
     private val pharmacistRepository: PharmacistRepository
@@ -11,7 +12,7 @@ class PharmacistService(
      * - Full name must not be blank
      * - License number must be unique
      */
-    fun registerPharmacist(pharmacist: Pharmacist): Boolean {
+    suspend fun registerPharmacist(pharmacist: Pharmacist): Boolean {
         require(pharmacist.fullName.isNotBlank()) { "Pharmacist name cannot be blank" }
         require(pharmacist.licenseNo.isNotBlank()) { "License number cannot be blank" }
 
@@ -20,25 +21,28 @@ class PharmacistService(
             println("Pharmacist with this license number already exists")
             return false
         }
-
+        delay(1000)
         pharmacistRepository.save(pharmacist)
         return true
     }
 
-    fun getPharmacistById(id: String): Pharmacist? {
+    suspend fun getPharmacistById(id: String): Pharmacist? {
+        delay(1000)
         return pharmacistRepository.findById(id)
     }
 
-    fun listPharmacists(): List<Pharmacist> {
+    suspend fun listPharmacists(): List<Pharmacist> {
+        delay(1000)
         return pharmacistRepository.findAll()
     }
 
     /**
      * Remove pharmacist only if they exist
      */
-    fun removePharmacist(id: String): Boolean {
+    suspend fun removePharmacist(id: String): Boolean {
         val pharmacist = pharmacistRepository.findById(id)
         if (pharmacist == null) return false
+        delay(1000)
         return pharmacistRepository.deleteById(pharmacist.id)
     }
 }

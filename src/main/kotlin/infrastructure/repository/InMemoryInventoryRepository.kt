@@ -3,6 +3,8 @@ package infrastructure.repository
 import application.ports.InventoryRepository
 import domain.model.InventoryItem
 import domain.model.Medicine
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 /**
  *  Class that implements the InventoryRepository interface
@@ -15,7 +17,7 @@ class InMemoryInventoryRepository : InventoryRepository {
      * @param item
      * return void
      */
-    override fun save(item: InventoryItem) {
+    override suspend fun save(item: InventoryItem)= withContext(Dispatchers.IO) {
         val existing = inventory.find { it.medicine.id == item.medicine.id }
         if (existing != null) {
             existing.quantity = item.quantity
@@ -29,8 +31,8 @@ class InMemoryInventoryRepository : InventoryRepository {
      * @param id
      * @return
      */
-    override fun findByMedicineId(id: String): InventoryItem? {
-        return inventory.find { it.medicine.id == id }
+    override suspend fun findByMedicineId(id: String): InventoryItem?=withContext(Dispatchers.IO) {
+        return@withContext inventory.find { it.medicine.id == id }
     }
 
     /**
@@ -38,12 +40,12 @@ class InMemoryInventoryRepository : InventoryRepository {
      * @param id
      * @return
      */
-    override fun findAll(): List<InventoryItem> {
-        return inventory.toList()
+    override suspend fun findAll(): List<InventoryItem> = withContext(Dispatchers.IO) {
+        return@withContext inventory.toList()
     }
 
-    override fun findById(id: String): Medicine? {
-        return inventory.find { it.medicine.id == id }?.medicine
+    override suspend fun findById(id: String): Medicine? = withContext(Dispatchers.IO) {
+        return@withContext inventory.find { it.medicine.id == id }?.medicine
     }
 
     /**
@@ -51,9 +53,9 @@ class InMemoryInventoryRepository : InventoryRepository {
      * @param medicineId
      * @param requiredQuantity
      */
-    override fun isAvailable(medicineId: String, requiredQuantity: Int): Boolean {
+    override suspend fun isAvailable(medicineId: String, requiredQuantity: Int): Boolean = withContext(Dispatchers.IO) {
         val item = findByMedicineId(medicineId)
-        return item != null && item.quantity >= requiredQuantity
+        return@withContext item != null && item.quantity >= requiredQuantity
     }
 
     /**
@@ -62,9 +64,9 @@ class InMemoryInventoryRepository : InventoryRepository {
      * @param quantity
      * @return Boolean
      */
-    override fun reduceStock(medicineId: String, quantity: Int): Boolean {
+    override suspend fun reduceStock(medicineId: String, quantity: Int): Boolean =withContext(Dispatchers.IO) {
         val item = findByMedicineId(medicineId) // get the inventory item
-        return if (item != null && item.quantity >= quantity) { // check if the quantity is available
+        return@withContext if (item != null && item.quantity >= quantity) { // check if the quantity is available
             item.quantity -= quantity
             true
         } else {
@@ -78,9 +80,9 @@ class InMemoryInventoryRepository : InventoryRepository {
      * @param quantity
      * @return Boolean
      */
-    override fun addStock(medicineId: String, quantity: Int): Boolean {
+    override suspend fun addStock(medicineId: String, quantity: Int): Boolean = withContext(Dispatchers.IO) {
         val item = findByMedicineId(medicineId)
-        return if (item != null) {
+        return@withContext if (item != null) {
             item.quantity += quantity
             true
         } else {

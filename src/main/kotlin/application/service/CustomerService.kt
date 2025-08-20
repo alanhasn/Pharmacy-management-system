@@ -2,6 +2,7 @@ package application.service
 
 import application.ports.CustomerRepository
 import domain.model.Customer
+import kotlinx.coroutines.delay
 
 class CustomerService(
     private val customerRepository: CustomerRepository
@@ -12,10 +13,10 @@ class CustomerService(
      * - Age must be >= 18
      * - Email must not already exist (simple uniqueness check)
      */
-    fun registerCustomer(customer: Customer): Boolean {
+    suspend fun registerCustomer(customer: Customer): Boolean {
         require(customer.fullName.isNotBlank()) { "Customer name cannot be blank" }
         require(customer.age() >= 15) { "Customer must be at least 18 years old" }
-
+        delay(1000)
         customerRepository.save(customer)
         return true
     }
@@ -23,7 +24,8 @@ class CustomerService(
     /**
      * Get customer by id
      */
-    fun getCustomerById(id: String): Customer? {
+    suspend fun getCustomerById(id: String): Customer? {
+        delay(1000)
         return customerRepository.findById(id)
     }
 
@@ -31,16 +33,18 @@ class CustomerService(
      * Get all customers
      * @return List of customers
      */
-    fun listCustomers(): List<Customer> {
+    suspend fun listCustomers(): List<Customer> {
+        delay(1000)
         return customerRepository.findAll()
     }
 
     /**
      * Remove customer only if they exist
      */
-    fun removeCustomer(id: String): Boolean {
+    suspend fun removeCustomer(id: String): Boolean {
         val customer = customerRepository.findById(id)
         if (customer == null) return false
+        delay(1000)
         return customerRepository.deleteById(customer.id)
     }
 }

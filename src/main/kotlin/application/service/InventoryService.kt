@@ -3,6 +3,7 @@ package application.service
 import application.ports.InventoryRepository
 import domain.model.InventoryItem
 import domain.model.Medicine
+import kotlinx.coroutines.delay
 import java.time.Instant
 
 /**
@@ -17,10 +18,11 @@ class InventoryService(
      * Add a new medicine to the inventory
      * Business Rule: Medicine cannot be expired when added
      */
-    fun addMedicine(inventoryItem: InventoryItem) {
+    suspend fun addMedicine(inventoryItem: InventoryItem) {
         if (inventoryItem.medicine.expiresAt?.isBefore(Instant.now()) == true) {
             throw IllegalArgumentException("Cannot add expired medicine to inventory")
         }
+        delay(1000)
         inventoryRepository.save(inventoryItem)
     }
 
@@ -28,8 +30,9 @@ class InventoryService(
      * Increase stock
      * Rule: Quantity must be positive
      */
-    fun addStock(medicineId: String, quantity: Int): Boolean {
+    suspend fun addStock(medicineId: String, quantity: Int): Boolean {
         require(quantity > 0) { "Quantity must be positive" }
+        delay(1000)
         return inventoryRepository.addStock(medicineId, quantity)
     }
 
@@ -37,25 +40,32 @@ class InventoryService(
      * Reduce stock
      * Rule: Cannot reduce below zero
      */
-    fun reduceStock(medicineId: String, quantity: Int): Boolean {
+    suspend fun reduceStock(medicineId: String, quantity: Int): Boolean {
         require(quantity > 0) { "Quantity must be positive" }
         val available = inventoryRepository.isAvailable(medicineId, quantity)
         if (!available) {
             return false
         }
+        delay(1000)
         return inventoryRepository.reduceStock(medicineId, quantity)
     }
 
     /**
      * Check availability
      */
-    fun isAvailable(medicineId: String, requiredQuantity: Int): Boolean {
+    suspend fun isAvailable(medicineId: String, requiredQuantity: Int): Boolean {
+        delay(1000)
         return inventoryRepository.isAvailable(medicineId, requiredQuantity)
     }
 
-    fun getMedicineById(medicineId: String): Medicine? =
-        inventoryRepository.findById(medicineId)
+    suspend fun getMedicineById(medicineId: String): Medicine? {
+        delay(1000)
+        return inventoryRepository.findById(medicineId)
+    }
 
-    fun getAllMedicines(): List<InventoryItem> =
-        inventoryRepository.findAll()
+    suspend fun getAllMedicines(): List<InventoryItem> {
+        delay(1000)
+        return inventoryRepository.findAll()
+    }
+
 }

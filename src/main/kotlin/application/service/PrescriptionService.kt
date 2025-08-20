@@ -5,6 +5,7 @@ import application.ports.PrescriptionRepository
 import domain.model.Prescription
 import domain.model.PrescriptionItem
 import domain.model.PrescriptionStatus
+import kotlinx.coroutines.delay
 
 class PrescriptionService(
     private val prescriptionRepository: PrescriptionRepository,
@@ -20,7 +21,7 @@ class PrescriptionService(
      * - Reduce stock
      * - Save prescription
      */
-    fun createPrescription(
+    suspend fun createPrescription(
         customerId: String,
         pharmacistId: String,
         items: List<PrescriptionItem>
@@ -41,6 +42,7 @@ class PrescriptionService(
         // 1. check availability
         for (item in prescription.items) {
             val available = inventoryRepository.isAvailable(item.medicine.id, item.quantity)
+            delay(1000)
             if (!available) {
                 return PrescriptionStatus.Rejected(
                     "Medicine ${item.medicine.name} not available in required quantity"
@@ -52,6 +54,7 @@ class PrescriptionService(
         for (item in prescription.items) {
             val success = inventoryRepository.reduceStock(item.medicine.id, item.quantity)
             if (!success) {
+                delay(1000)
                 return PrescriptionStatus.Rejected(
                     "Failed to reduce stock for ${item.medicine.name}"
                 )
@@ -59,6 +62,7 @@ class PrescriptionService(
         }
 
         // 3. save prescription
+        delay(1000)
         prescriptionRepository.save(prescription)
         return PrescriptionStatus.Approved
     }
@@ -66,28 +70,32 @@ class PrescriptionService(
     /**
      * Retrieve prescription by ID
      */
-    fun getPrescriptionById(id: String): Prescription? {
+    suspend fun getPrescriptionById(id: String): Prescription? {
+        delay(1000)
         return prescriptionRepository.findById(id)
     }
 
     /**
      * Get all prescriptions for a given customer
      */
-    fun getPrescriptionsByCustomer(customerId: String): List<Prescription> {
+    suspend fun getPrescriptionsByCustomer(customerId: String): List<Prescription> {
+        delay(1000)
         return prescriptionRepository.findByCustomer(customerId)
     }
 
     /**
      * Get all prescriptions for a given pharmacist
      */
-    fun getPrescriptionsByPharmacist(pharmacistId: String): List<Prescription> {
+    suspend fun getPrescriptionsByPharmacist(pharmacistId: String): List<Prescription> {
+        delay(1000)
         return prescriptionRepository.findByPharmacist(pharmacistId)
     }
 
     /**
      * Get all prescriptions
      */
-    fun getAllPrescriptions(): List<Prescription> {
+    suspend fun getAllPrescriptions(): List<Prescription> {
+        delay(1000)
         return prescriptionRepository.findAll()
     }
 }
