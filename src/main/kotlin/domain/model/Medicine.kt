@@ -2,6 +2,9 @@ package domain.model
 import java.time.Instant
 import java.util.UUID
 
+/**
+ * Data class for medicine
+ */
 data class Medicine(
     val id: String = UUID.randomUUID().toString(),
     val name: String,

@@ -2,6 +2,7 @@ package infrastructure.repository
 
 import application.ports.InventoryRepository
 import domain.model.InventoryItem
+import domain.model.Medicine
 
 /**
  *  Class that implements the InventoryRepository interface
@@ -39,6 +40,10 @@ class InMemoryInventoryRepository : InventoryRepository {
      */
     override fun findAll(): List<InventoryItem> {
         return inventory.toList()
+    }
+
+    override fun findById(id: String): Medicine? {
+        return inventory.find { it.medicine.id == id }?.medicine
     }
 
     /**
