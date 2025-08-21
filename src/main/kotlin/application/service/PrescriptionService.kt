@@ -1,15 +1,16 @@
 package application.service
 
-import application.ports.InventoryRepository
 import application.ports.PrescriptionRepository
+import domain.model.Medicine
 import domain.model.Prescription
 import domain.model.PrescriptionItem
 import domain.model.PrescriptionStatus
 import kotlinx.coroutines.delay
+import java.time.Instant
 
 class PrescriptionService(
     private val prescriptionRepository: PrescriptionRepository,
-    private val inventoryRepository: InventoryRepository,
+    private val inventoryRepository: InventoryService,
     private val customerService: CustomerService,
     private val pharmacistService: PharmacistService
 ) {
@@ -61,6 +62,44 @@ class PrescriptionService(
             }
         }
 
+        // Each quantity must be positive
+        for (item in items) {
+            if (item.quantity <= 0) {
+                return PrescriptionStatus.Rejected("All quantities must be positive.")
+            }
+        }
+
+        // Medicines in the same prescription must not be duplicated
+        val seenIds = mutableSetOf<String>()
+        for (item in items) {
+            if (!seenIds.add(item.medicine.id)) {
+                return PrescriptionStatus.Rejected("Duplicate medicines in the same prescription are not allowed.")
+            }
+        }
+
+        // Expired medicines are not allowed
+        for (item in items) {
+            val expiry = item.medicine.expiresAt
+            if (expiry != null && expiry.isBefore(Instant.now())) {
+                return PrescriptionStatus.Rejected("Prescription contains expired medicine.")
+            }
+        }
+
+        // Check minimum age requirement
+        for (item in items) {
+            val minAge = item.medicine.minAge
+            if (minAge != null && customer.age() < minAge) {
+                return PrescriptionStatus.Rejected("Customer does not meet the minimum age requirement.")
+            }
+        }
+
+        // Check pharmacist’s license for special medicines
+        for (item in items) {
+            if (item.medicine.requiresSpecialLicense && !pharmacist.hasSpecialLicense) {
+                return PrescriptionStatus.Rejected("Pharmacist is not authorized to dispense one or more medicines.")
+            }
+        }
+
         // 3. save prescription
         delay(1000)
         prescriptionRepository.save(prescription)
@@ -97,5 +136,10 @@ class PrescriptionService(
     suspend fun getAllPrescriptions(): List<Prescription> {
         delay(1000)
         return prescriptionRepository.findAll()
+    }
+
+    suspend fun getMedicineById(id: String): Medicine? {
+        delay(1000)
+        return inventoryRepository.getMedicineById(id)
     }
 }

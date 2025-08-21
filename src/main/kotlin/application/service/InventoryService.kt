@@ -68,4 +68,9 @@ class InventoryService(
         return inventoryRepository.findAll()
     }
 
+    suspend fun getAllInventoryItems(): List<InventoryItem> {
+        delay(1000)
+        return inventoryRepository.findAll()
+    }
+
 }

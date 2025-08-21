@@ -3,6 +3,7 @@ package application.service
 import application.ports.CustomerRepository
 import domain.model.Customer
 import kotlinx.coroutines.delay
+import java.time.LocalDate
 
 class CustomerService(
     private val customerRepository: CustomerRepository
@@ -14,9 +15,22 @@ class CustomerService(
      * - Email must not already exist (simple uniqueness check)
      */
     suspend fun registerCustomer(customer: Customer): Boolean {
-        require(customer.fullName.isNotBlank()) { "Customer name cannot be blank" }
-        require(customer.age() >= 15) { "Customer must be at least 18 years old" }
-        delay(1000)
+        if (customer.fullName.isBlank()) {
+            println("Customer name cannot be blank")
+            return false
+        }
+
+        if (customer.birthDate.isAfter(LocalDate.now())) {
+            println("Birth date cannot be in the future")
+            return false
+        }
+
+        if (customer.age() < 18) {
+            println("Customer must be at least 18 years old")
+            return false
+        }
+
+        delay(500) // simulate DB/network delay
         customerRepository.save(customer)
         return true
     }
