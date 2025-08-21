@@ -19,4 +19,4 @@ The project is structured as follows:
 *   `domain`: Contains all domain-related logic
 *   `application`: Contains all application-related logic
 *   `infrastructure`: Contains all infrastructure-related logic, such as repositories
-*   `util`: Contains utility functions
+*   `ui`: Contains all ui functions for presentation
